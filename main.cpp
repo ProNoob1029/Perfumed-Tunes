@@ -3,8 +3,42 @@
 #include "vector"
 #include "id3v2lib-2.0/id3v2lib.h"
 #include "cstring"
+#define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+int main() {
+    InitWindow(800, 800, "spotify-clone");
+    SetTargetFPS(60);
+
+    const int items = 3;
+
+    Rectangle panelRec = {100, 100, 200, 200};
+    Rectangle panelContentRec = {0, 0, 186, items * 100};
+    Rectangle panelView = {};
+    Vector2 panelScroll = {};
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+
+        ClearBackground(WHITE);
+
+        GuiScrollPanel(panelRec, NULL, panelContentRec, &panelScroll, &panelView);
+
+        BeginScissorMode(panelView.x, panelView.y, panelView.width, panelView.height);
+
+        for (int i = 0; i < items; i++) {
+            DrawText(TextFormat("Hi %i", i + 1), 20 + panelView.x + panelScroll.x, 20 + panelView.y + panelScroll.y + i * 100, 20, BLACK);
+        }
+
+        EndScissorMode();
+
+        EndDrawing();
+    }
+
+    CloseWindow();
+}
+
+/*
 int main() {
     InitWindow(800, 800, "spotify-clone");
 
@@ -80,19 +114,14 @@ int main() {
 
             ClearBackground(RAYWHITE);
 
-            DrawText("Congrats! You created your first window!", 190, 200, 20, BLACK);
-
             DrawText(title, 0, 50, 30, BLACK);
 
-            if (!musicList.empty()) {
+            {
                 float aux = musicProgress;
-                GuiSliderBar(Rectangle{100, 50, 500, 50}, "left", "right", &musicProgress, 0, musicLenght);
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "ConstantConditionsOC"
-                if (aux != musicProgress) {
+                GuiSliderBar(Rectangle{100, 100, 500, 50}, "left", "right", &musicProgress, 0, musicLenght);
+                if (aux != musicProgress && !musicList.empty()) {
                     SeekMusicStream(musicList[0], musicProgress);
                 }
-#pragma clang diagnostic pop
             }
 
             if (showCover) {
@@ -110,4 +139,4 @@ int main() {
     CloseWindow();
 
     return 0;
-}
+}*/
