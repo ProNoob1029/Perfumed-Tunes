@@ -24,7 +24,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 endif()
 
 # Our Project
-add_executable(${PROJECT_NAME} main.cpp raygui.h
+add_executable(${PROJECT_NAME} main.cpp
         mygui.h
         song.h)
 #set(raylib_VERBOSE 1)

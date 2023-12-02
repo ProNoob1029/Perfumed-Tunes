@@ -3,7 +3,7 @@
 #include "raylib.h"
 #include "song.h"
 #include "vector"
-#define RAYGUI_IMPLEMENTATION
+#define RAYGUI_IMPLEMENTATION   //do not delete
 #include "raygui.h"
 
 void ConfigUI() {
@@ -37,4 +37,4 @@ typedef struct MusicPanel {
     }
 } MusicPanel;
 
-#endif
+#endif //SPOTIFY_CLONE_MYGUI_H
