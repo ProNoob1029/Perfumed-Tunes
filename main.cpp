@@ -1,36 +1,40 @@
-#include <cstdlib>
 #include "raylib.h"
-#include "vector"
-#include "id3v2lib-2.0/id3v2lib.h"
-#include "cstring"
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+#include "mygui.h"
+#include "song.h"
 
 int main() {
-    InitWindow(800, 800, "spotify-clone");
+    InitWindow(1600, 900, "spotify-clone");
+    InitAudioDevice();
     SetTargetFPS(60);
 
-    const int items = 3;
+    ConfigUI();
 
-    Rectangle panelRec = {100, 100, 200, 200};
-    Rectangle panelContentRec = {0, 0, 186, items * 100};
-    Rectangle panelView = {};
-    Vector2 panelScroll = {};
+    MusicPanel musicPanel;
+
+    std::queue<char*> songPaths;
+    std::vector<Song> songs;
 
     while (!WindowShouldClose()) {
+        if (IsFileDropped()) {
+            FilePathList droppedFiles = LoadDroppedFiles();
+            for (int i = 0; i < droppedFiles.count; i++) {
+                GetSongFilePaths(songPaths, droppedFiles.paths[i]);
+            }
+            UnloadDroppedFiles(droppedFiles);
+        }
+
+        if (!songPaths.empty()) {
+            songs.push_back(LoadSong(songPaths.front()));
+            songPaths.pop();
+        }
+
         BeginDrawing();
 
         ClearBackground(WHITE);
 
-        GuiScrollPanel(panelRec, NULL, panelContentRec, &panelScroll, &panelView);
+        musicPanel.Draw(songs);
 
-        BeginScissorMode(panelView.x, panelView.y, panelView.width, panelView.height);
-
-        for (int i = 0; i < items; i++) {
-            DrawText(TextFormat("Hi %i", i + 1), 20 + panelView.x + panelScroll.x, 20 + panelView.y + panelScroll.y + i * 100, 20, BLACK);
-        }
-
-        EndScissorMode();
+        DrawFPS(0,0);
 
         EndDrawing();
     }
