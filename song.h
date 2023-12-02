@@ -26,6 +26,7 @@ void UnloadSong(Song song) {
 Song LoadSong(char filepath[]) {
     Song newSong;
     newSong.music = LoadMusicStream(filepath);
+    newSong.music.looping = false;
 
     ID3v2_Tag *tag = ID3v2_read_tag(filepath);
 
@@ -59,12 +60,10 @@ void GetSongFilePaths(std::queue<char*> &paths, char filepath[]) {
         if (FileExists(filepath) && IsFileExtension(filepath, ".mp3")) {
             paths.push(filepath);
         }
-    } else {
-        if (DirectoryExists(filepath)) {
-            FilePathList files = LoadDirectoryFiles(filepath);
-            for (int i = 0; i < files.count; i++) {
-                GetSongFilePaths(paths, files.paths[i]);
-            }
+    } else if (DirectoryExists(filepath)) {
+        FilePathList files = LoadDirectoryFiles(filepath);
+        for (int i = 0; i < files.count; i++) {
+            GetSongFilePaths(paths, files.paths[i]);
         }
     }
 }

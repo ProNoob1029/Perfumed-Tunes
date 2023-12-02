@@ -11,22 +11,26 @@ void ConfigUI() {
     //GuiSetStyle(SLIDER, BORDER + 2*3, ColorToInt(RED));
 }
 
+void DrawSong(Song &song, int x, int y) {
+    DrawText(song.title, 110 + x, 20 + y, 20, BLACK);
+    DrawTextureEx(song.cover, {(float) x, (float) y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
+}
+
 typedef struct MusicPanel {
     int itemHeight = 100;
-    Rectangle bounds = {0, 0, 300, 900};
-    Rectangle content = {0, 0, 286, 0};
+    Rectangle bounds = {0, 0, 700, 900};
+    Rectangle content = {0, 0, bounds.width - 14, 0};
     Vector2 scroll = {};
     Rectangle view = {};
     void Draw(std::vector<Song> &songs) {
-        content.height = (float)(songs.size() * itemHeight);
+        content.height = float(songs.size() * itemHeight);
 
         GuiScrollPanel(bounds, nullptr, content, &scroll, &view);
 
         BeginScissorMode((int)view.x, (int)view.y, (int)view.width, (int)view.height);
 
         for (int i = 0; i < songs.size(); i++) {
-            DrawText(songs[i].title, (int)(74 + view.x + scroll.x), (int)(20 + view.y + scroll.y + (float)(i * itemHeight)), 20, BLACK);
-            DrawTextureEx(songs[i].cover, {view.x + scroll.x, view.y + scroll.y + (float)(i * itemHeight)}, 0.0f, 64.0f / (float)std::max(songs[i].cover.height, songs[i].cover.width), WHITE);
+            DrawSong(songs[i], int(view.x + scroll.x), int(view.y + scroll.y + float(i * itemHeight)));
         }
 
         EndScissorMode();

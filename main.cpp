@@ -28,6 +28,13 @@ int main() {
             songPaths.pop();
         }
 
+        for(Song song : songs) {
+            Music music = song.music;
+            if (IsMusicStreamPlaying(music)) {
+                UpdateMusicStream(music);
+            }
+        }
+
         BeginDrawing();
 
         ClearBackground(WHITE);
