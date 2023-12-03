@@ -8,10 +8,10 @@
 #include <cstdlib>
 #include <codecvt>
 #include "raylib.h"
-#include "queue"
-#include "cstring"
-#include "string"
-#include "locale"
+#include <queue>
+#include <cstring>
+#include <string>
+#include <locale>
 #include "id3v2lib-2.0/id3v2lib.h"
 
 struct Song {

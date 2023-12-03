@@ -3,7 +3,7 @@
 #include "raylib.h"
 #include "song.h"
 #include "vector"
-#define RAYGUI_IMPLEMENTATION   //do not delete
+#define RAYGUI_IMPLEMENTATION   //DO NOT DELETE
 #include "raygui.h"
 
 void ConfigUI() {
