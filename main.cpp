@@ -8,33 +8,30 @@ int main() {
     InitAudioDevice();
     SetTargetFPS(60);
 
+    //TODO: try sdf fonts
+
     ConfigUI();
 
     MusicPanel musicPanel;
 
-    std::queue<char*> songPaths;
+    std::queue<std::string> songPaths;
     std::vector<Song> songs;
 
-    FilePathList droppedFiles;
-    droppedFiles.count = 0;
-
     while (!WindowShouldClose()) {
-        if (IsFileDropped() && droppedFiles.count == 0) {
-            droppedFiles = LoadDroppedFiles();
+        if (IsFileDropped()) {
+            FilePathList droppedFiles = LoadDroppedFiles();
             for (int i = 0; i < droppedFiles.count; i++) {
                 GetSongFilePaths(songPaths, droppedFiles.paths[i]);
             }
+            UnloadDroppedFiles(droppedFiles);
         }
 
         if (!songPaths.empty()) {
-            songs.push_back(LoadSong(songPaths.front()));
+            songs.push_back(LoadSong(songPaths.front().c_str()));
             songPaths.pop();
-        } else if (droppedFiles.count != 0) {
-            UnloadDroppedFiles(droppedFiles);
-            droppedFiles.count = 0;
         }
 
-        for(Song song : songs) {
+        for(const Song& song : songs) {
             Music music = song.music;
             if (IsMusicStreamPlaying(music)) {
                 UpdateMusicStream(music);
@@ -50,6 +47,10 @@ int main() {
         DrawFPS(0,0);
 
         EndDrawing();
+    }
+
+    for(Song& song : songs) {
+        UnloadSong(song);
     }
 
     CloseWindow();

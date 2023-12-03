@@ -26,7 +26,7 @@ void UnloadSong(Song &song) {
     UnloadTexture(song.cover);
 }
 
-Song LoadSong(char filepath[]) {
+Song LoadSong(const char filepath[]) {
     Song newSong;
     newSong.music = LoadMusicStream(filepath);
     newSong.music.looping = false;
@@ -69,10 +69,10 @@ Song LoadSong(char filepath[]) {
     return newSong;
 }
 
-void GetSongFilePaths(std::queue<char*> &paths, char filepath[]) {
+void GetSongFilePaths(std::queue<std::string> &paths, char filepath[]) {
     if (IsPathFile(filepath)) {
         if (FileExists(filepath) && IsFileExtension(filepath, ".mp3")) {
-            paths.push(filepath);
+            paths.emplace(filepath);
         }
     } else if (DirectoryExists(filepath)) {
         FilePathList files = LoadDirectoryFiles(filepath);
