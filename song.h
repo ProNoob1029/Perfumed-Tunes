@@ -6,10 +6,12 @@
 #define SPOTIFY_CLONE_SONG_H
 
 #include <cstdlib>
+#include <codecvt>
 #include "raylib.h"
 #include "queue"
 #include "cstring"
 #include "string"
+#include "locale"
 #include "id3v2lib-2.0/id3v2lib.h"
 
 struct Song {
@@ -48,8 +50,14 @@ Song LoadSong(char filepath[]) {
     ID3v2_TextFrame *tagTitle = ID3v2_Tag_get_title_frame(tag);
 
     if (tagTitle != nullptr) {
-        newSong.title = tagTitle->data->text;
-        printf("%s\n", newSong.title.c_str());
+        if(tagTitle->data->encoding == '\001') {
+            //Encoding is a bitch
+            std::u16string u16title = (char16_t*)tagTitle->data->text;
+            newSong.title = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16title);
+            newSong.title = newSong.title.c_str() + 3;
+        } else {
+            newSong.title = tagTitle->data->text;
+        }
     } else {
         std::string filename = GetFileName(filepath);
         newSong.title = filename.substr(0, filename.length() - 4);
