@@ -9,16 +9,17 @@
 #include "raylib.h"
 #include "queue"
 #include "cstring"
+#include "string"
 #include "id3v2lib-2.0/id3v2lib.h"
 
 struct Song {
     Music music{};
-    char title[256] = "";
+    std::string title;
     bool hasCover = false;
     Texture cover{};
 };
 
-void UnloadSong(Song song) {
+void UnloadSong(Song &song) {
     UnloadMusicStream(song.music);
     UnloadTexture(song.cover);
 }
@@ -47,7 +48,12 @@ Song LoadSong(char filepath[]) {
     ID3v2_TextFrame *tagTitle = ID3v2_Tag_get_title_frame(tag);
 
     if (tagTitle != nullptr) {
-        TextCopy(newSong.title, tagTitle->data->text);
+        newSong.title = tagTitle->data->text;
+        printf("%s\n", newSong.title.c_str());
+    } else {
+        std::string filename = GetFileName(filepath);
+        newSong.title = filename.substr(0, filename.length() - 4);
+        printf("%s\n", newSong.title.c_str());
     }
 
     free(tag);

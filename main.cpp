@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "mygui.h"
+#include "unordered_map"
 #include "song.h"
 
 int main() {
@@ -14,18 +15,23 @@ int main() {
     std::queue<char*> songPaths;
     std::vector<Song> songs;
 
+    FilePathList droppedFiles;
+    droppedFiles.count = 0;
+
     while (!WindowShouldClose()) {
-        if (IsFileDropped()) {
-            FilePathList droppedFiles = LoadDroppedFiles();
+        if (IsFileDropped() && droppedFiles.count == 0) {
+            droppedFiles = LoadDroppedFiles();
             for (int i = 0; i < droppedFiles.count; i++) {
                 GetSongFilePaths(songPaths, droppedFiles.paths[i]);
             }
-            UnloadDroppedFiles(droppedFiles);
         }
 
         if (!songPaths.empty()) {
             songs.push_back(LoadSong(songPaths.front()));
             songPaths.pop();
+        } else if (droppedFiles.count != 0) {
+            UnloadDroppedFiles(droppedFiles);
+            droppedFiles.count = 0;
         }
 
         for(Song song : songs) {

@@ -12,8 +12,10 @@ void ConfigUI() {
 }
 
 void DrawSong(Song &song, int x, int y) {
-    DrawText(song.title, 110 + x, 20 + y, 20, BLACK);
-    DrawTextureEx(song.cover, {(float) x, (float) y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
+    DrawText(song.title.c_str(), 110 + x, 20 + y, 20, BLACK);
+    if (song.hasCover) {
+        DrawTextureEx(song.cover, {(float) x, (float) y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
+    }
 }
 
 typedef struct MusicPanel {
