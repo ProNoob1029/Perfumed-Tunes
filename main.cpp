@@ -29,28 +29,28 @@ int main() {
         }
 
         if (!songPaths.empty()) {
-            songs.insert(LoadSong(songPaths.front().c_str()));
+            songs.insert(LoadSong(songPaths.front().c_str()));  //Loads songs from songPaths queue one by one
             songPaths.pop();
         }
 
-        for(const Song& song : songs) {
+        for(const Song& song : songs) { //TODO: maybe change to make sure only one song plays
             Music music = song.music;
             if (IsMusicStreamPlaying(music)) {
-                UpdateMusicStream(music);
-                slider = GetMusicTimePlayed(music);
+                UpdateMusicStream(music);   //keeps the song playing
+                slider = GetMusicTimePlayed(music);     //Updates the slider
             }
         }
 
         if (!songQueue.empty() && !IsMusicStreamPlaying(songQueue.front().music)) {
-            songQueue.pop();
+            songQueue.pop();    //Removes song from queue if it's done playing
         }
 
-        if (IsKeyPressed(KEY_P) && !songQueue.empty()) {
-            StopMusicStream(songQueue.front().music);
-            songQueue.pop();
+        if (IsKeyPressed(KEY_P) && !songQueue.empty()) {    //if key P is presed, skip song
+            StopMusicStream(songQueue.front().music);       //stop the current song
+            songQueue.pop();    //remove current song from queue
             if (!songQueue.empty()) {
-                SeekMusicStream(songQueue.front().music, 0.0f);
-                PlayMusicStream(songQueue.front().music);
+                SeekMusicStream(songQueue.front().music, 0.0f); //Seek next song from start
+                PlayMusicStream(songQueue.front().music);   //Play next song
             }
         }
 
