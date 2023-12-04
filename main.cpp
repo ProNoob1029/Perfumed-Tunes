@@ -1,24 +1,27 @@
 #include "raylib.h"
 #include "mygui.h"
 #include "song.h"
+#include "set"
 
 int main() {
-    InitWindow(1600, 900, "spotify-clone");
-    InitAudioDevice();
-    SetTargetFPS(60);
+    InitWindow(1280, 720, "spotify-clone"); //creeaza fereastra+ii da nume+size
+    InitAudioDevice(); //"porneste castile"-se conecteaza la audio
+    SetTargetFPS(60); //cat de rapid isi da update/ cat de rapid deseneaza/ viteza while/s
 
     //TODO: try sdf fonts
 
-    ConfigUI();
+    ConfigUI(); //change colors of UI
 
-    MusicPanel musicPanel;
+    MusicPanel musicPanel;  //the music list on the left
 
-    std::queue<std::string> songPaths;
-    std::vector<Song> songs;
+    std::queue<std::string> songPaths;  //song filepaths queued for importing-fisierele sunt incarcate pe rand
+    std::set<Song> songs; //o multime de piese
+    std::queue<Song> songQueue; //
+    float slider = 0.0f; //piesa incepe de la timpul 0.0
 
-    while (!WindowShouldClose()) {
-        if (IsFileDropped()) {
-            FilePathList droppedFiles = LoadDroppedFiles();
+    while (!WindowShouldClose()) { // verifica daca ai inchis programul (true=> stop)
+        if (IsFileDropped()) { //
+            FilePathList droppedFiles = LoadDroppedFiles(); //
             for (int i = 0; i < droppedFiles.count; i++) {
                 GetSongFilePaths(songPaths, droppedFiles.paths[i]);
             }
@@ -26,7 +29,7 @@ int main() {
         }
 
         if (!songPaths.empty()) {
-            songs.push_back(LoadSong(songPaths.front().c_str()));
+            songs.insert(LoadSong(songPaths.front().c_str()));
             songPaths.pop();
         }
 
@@ -34,6 +37,20 @@ int main() {
             Music music = song.music;
             if (IsMusicStreamPlaying(music)) {
                 UpdateMusicStream(music);
+                slider = GetMusicTimePlayed(music);
+            }
+        }
+
+        if (!songQueue.empty() && !IsMusicStreamPlaying(songQueue.front().music)) {
+            songQueue.pop();
+        }
+
+        if (IsKeyPressed(KEY_P) && !songQueue.empty()) {
+            StopMusicStream(songQueue.front().music);
+            songQueue.pop();
+            if (!songQueue.empty()) {
+                SeekMusicStream(songQueue.front().music, 0.0f);
+                PlayMusicStream(songQueue.front().music);
             }
         }
 
@@ -41,119 +58,30 @@ int main() {
 
         ClearBackground(WHITE);
 
-        musicPanel.Draw(songs);
+        musicPanel.Draw(songs, songQueue);
+
+        if (!songQueue.empty() && songQueue.front().hasCover) {
+            DrawTexture(songQueue.front().cover, 640, 0, WHITE);
+        }
+
+        if (!songQueue.empty()) {
+            Rectangle sliderRec = {640, 640, 640, 80};
+            float temp = slider;
+            GuiSliderBar(sliderRec, nullptr, nullptr, &slider, 0.0f, GetMusicTimeLength(songQueue.front().music));
+            //ignore warning, slider can be changed by GuiSliderBar
+            if (slider != temp) {
+                SeekMusicStream(songQueue.front().music, slider);
+            }
+        }
 
         DrawFPS(0,0);
 
         EndDrawing();
     }
 
-    for(Song& song : songs) {
+    for(const Song& song : songs) {
         UnloadSong(song);
     }
 
     CloseWindow();
 }
-
-/*
-int main() {
-    InitWindow(800, 800, "spotify-clone");
-
-    InitAudioDevice();
-
-    SetTargetFPS(60);
-
-    bool showCover = false;
-    Texture coverTexture;
-    char title[128] = "";
-
-    std::vector<Music> musicList;
-
-    float musicProgress = 0;
-    float musicLenght = 0;
-
-    while (!WindowShouldClose()) {
-        if (IsFileDropped())
-        {
-            FilePathList droppedFiles = LoadDroppedFiles();
-
-            Music newMusic = LoadMusicStream(droppedFiles.paths[0]);
-            newMusic.looping = false;
-            PlayMusicStream(newMusic);
-            musicList.push_back(newMusic);
-
-            musicLenght = GetMusicTimeLength(musicList[0]);
-
-            ID3v2_Tag *tag = ID3v2_read_tag(droppedFiles.paths[0]);
-
-            ID3v2_ApicFrame *cover = ID3v2_Tag_get_album_cover_frame(tag);
-
-            if (cover != nullptr) {
-                Image coverImage = LoadImageFromMemory(".jpeg", reinterpret_cast<const unsigned char *>(cover->data->data), cover->data->picture_size);
-                coverTexture = LoadTextureFromImage(coverImage);
-                UnloadImage(coverImage);
-                showCover = true;
-            }
-
-            ID3v2_TextFrame *tagTitle = ID3v2_Tag_get_title_frame(tag);
-
-            if (tagTitle != nullptr) {
-                strcpy(title, tagTitle->data->text);
-            }
-
-            free(tag);
-
-            UnloadDroppedFiles(droppedFiles);
-        }
-
-        if (IsKeyPressed(KEY_C)) {
-            while (!musicList.empty()) {
-                UnloadMusicStream(musicList.back());
-                musicList.pop_back();
-            }
-        }
-
-        for (int i = 0; i < musicList.size(); i++) {
-            if (IsMusicStreamPlaying(musicList[i])) {
-                if (i == 0) {
-                    UpdateMusicStream(musicList[0]);
-                    musicProgress = GetMusicTimePlayed(musicList[0]);
-                } else {
-                    UpdateMusicStream(musicList[i]);
-                }
-            } else {
-                UnloadMusicStream(musicList[i]);
-                musicList.erase(musicList.begin() + i);
-            }
-        }
-
-        BeginDrawing();
-
-            ClearBackground(RAYWHITE);
-
-            DrawText(title, 0, 50, 30, BLACK);
-
-            {
-                float aux = musicProgress;
-                GuiSliderBar(Rectangle{100, 100, 500, 50}, "left", "right", &musicProgress, 0, musicLenght);
-                if (aux != musicProgress && !musicList.empty()) {
-                    SeekMusicStream(musicList[0], musicProgress);
-                }
-            }
-
-            if (showCover) {
-                DrawTexture(coverTexture, 0, 150, WHITE);
-            }
-
-            DrawFPS(0, 0);
-        EndDrawing();
-    }
-
-    for (auto music : musicList) {
-        UnloadMusicStream(music);
-    }
-
-    CloseWindow();
-
-    return 0;
-}*/

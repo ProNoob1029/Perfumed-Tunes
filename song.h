@@ -19,9 +19,17 @@ struct Song {
     std::string title;
     bool hasCover = false;
     Texture cover{};
+
+    bool operator==(const Song &other) const {
+        return title == other.title;
+    }
+
+    bool operator<(const Song& other) const {
+        return title < other.title;
+    }
 };
 
-void UnloadSong(Song &song) {
+void UnloadSong(const Song &song) {
     UnloadMusicStream(song.music);
     UnloadTexture(song.cover);
 }
@@ -71,13 +79,13 @@ Song LoadSong(const char filepath[]) {
 
 void GetSongFilePaths(std::queue<std::string> &paths, char filepath[]) {
     if (IsPathFile(filepath)) {
-        if (FileExists(filepath) && IsFileExtension(filepath, ".mp3")) {
+        if (FileExists(filepath) && IsFileExtension(filepath, ".mp3")) { //verifica daca exista si e mp3
             paths.emplace(filepath);
         }
     } else if (DirectoryExists(filepath)) {
         FilePathList files = LoadDirectoryFiles(filepath);
         for (int i = 0; i < files.count; i++) {
-            GetSongFilePaths(paths, files.paths[i]);
+            GetSongFilePaths(paths, files.paths[i]); // se apeleaza recursiv
         }
     }
 }
