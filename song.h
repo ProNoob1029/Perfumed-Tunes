@@ -16,6 +16,7 @@
 
 struct Song {
     Music music{};
+    bool paused = false;
     std::string title;
     bool hasCover = false;
     Texture cover{};
@@ -88,6 +89,10 @@ void GetSongFilePaths(std::queue<std::string> &paths, char filepath[]) {
             GetSongFilePaths(paths, files.paths[i]); // se apeleaza recursiv
         }
     }
+}
+
+bool IsMusicDone(Music music) {
+    return !IsMusicStreamPlaying(music) && GetMusicTimePlayed(music) == 0;
 }
 
 #endif //SPOTIFY_CLONE_SONG_H

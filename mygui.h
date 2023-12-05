@@ -7,13 +7,22 @@
 #define RAYGUI_IMPLEMENTATION   //DO NOT DELETE
 #include "raygui.h"
 
-void ConfigUI() {
-    //GuiSetStyle(DEFAULT, BACKGROUND_COLOR, ColorToInt(DARKGRAY));
-    //GuiSetStyle(SLIDER, BORDER + 2*3, ColorToInt(RED));
+void ConfigUI(Color background) {
+    GuiSetStyle(SLIDER, BORDER_WIDTH, 0);
+    GuiSetStyle(DEFAULT, BORDER_WIDTH, 0);
+
+    Color sliderBg = {49, 37, 61, 255};
+
+
+    GuiSetStyle(DEFAULT, BACKGROUND_COLOR, ColorToInt(background));
+    GuiSetStyle(SLIDER, BASE_COLOR_NORMAL, ColorToInt(sliderBg));
+    GuiSetStyle(SLIDER, BASE_COLOR_PRESSED, ColorToInt({220, 202, 233, 255}));
+    GuiSetStyle(SLIDER, TEXT_COLOR_FOCUSED, ColorToInt({157, 114, 194, 255}));
+    GuiSetStyle(SLIDER, TEXT_COLOR_PRESSED, ColorToInt({146, 78, 191, 255}));
 }
 
 void DrawSong(const Song &song, int x, int y) {
-    DrawText(song.title.c_str(), 110 + x, 20 + y, 20, BLACK);
+    DrawText(song.title.c_str(), 110 + x, 20 + y, 20, WHITE);
     if (song.hasCover) {
         DrawTextureEx(song.cover, {(float) x, (float) y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
     }
@@ -28,14 +37,14 @@ typedef struct MusicPanel {
     Rectangle content = {0, 0, bounds.width - 14, 0};
     Vector2 scroll = {};
     Rectangle view = {};
-    void Draw(std::set<Song> &songs, std::queue<Song> &songQueue) {
+    void Draw(std::set<Song> &songs, std::queue<Song> &songQueue, Vector2 &mousePoint) {
         content.height = float(songs.size() * itemHeight);
 
         GuiScrollPanel(bounds, nullptr, content, &scroll, &view);
 
         BeginScissorMode((int)view.x, (int)view.y, (int)view.width, (int)view.height);
 
-        Vector2 mousePoint = GetMousePosition();
+
 
         int i = 0;
         for (auto &song : songs) {
@@ -43,14 +52,7 @@ typedef struct MusicPanel {
             DrawSong(song, (int)itemRec.x, (int)itemRec.y);
 
             if (CheckCollisionPointRec(mousePoint, itemRec) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                //std::queue<Song> empty;
-                //empty.push(song);
-                if (songQueue.empty()) {
-                    SeekMusicStream(song.music, 0.0f);
-                    PlayMusicStream(song.music);
-                }
                 songQueue.push(song);
-                //songQueue = empty;
             }
             i++;
         }
