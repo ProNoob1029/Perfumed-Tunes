@@ -1,26 +1,35 @@
-#ifndef SPOTIFY_CLONE_MYGUI_H
-#define SPOTIFY_CLONE_MYGUI_H
+#ifndef SPOTIFY_CLONE_MYGUI_H //inceputul unui fisier
+#define SPOTIFY_CLONE_MYGUI_H //inceputul unui fisier
 #include "raylib.h"
 #include "song.h"
-#include "vector"
+#include "vector" //vector cu marime variabila
 #include "set"
 #define RAYGUI_IMPLEMENTATION   //DO NOT DELETE
 #include "raygui.h"
 
+//schimba culorile la layout
 void ConfigUI(Color background) {
     GuiSetStyle(SLIDER, BORDER_WIDTH, 0);
     GuiSetStyle(DEFAULT, BORDER_WIDTH, 0);
 
     Color sliderBg = {49, 37, 61, 255};
-
+    Color neutralSlider = {157, 114, 194, 255};
+    Color focusedSlider = {220, 202, 233, 255};
+    Color pressedSlider = {146, 78, 191, 255};
 
     GuiSetStyle(DEFAULT, BACKGROUND_COLOR, ColorToInt(background));
     GuiSetStyle(SLIDER, BASE_COLOR_NORMAL, ColorToInt(sliderBg));
-    GuiSetStyle(SLIDER, BASE_COLOR_PRESSED, ColorToInt({220, 202, 233, 255}));
-    GuiSetStyle(SLIDER, TEXT_COLOR_FOCUSED, ColorToInt({157, 114, 194, 255}));
-    GuiSetStyle(SLIDER, TEXT_COLOR_PRESSED, ColorToInt({146, 78, 191, 255}));
+    GuiSetStyle(SLIDER, BASE_COLOR_PRESSED, ColorToInt(neutralSlider));
+    GuiSetStyle(SLIDER, TEXT_COLOR_FOCUSED, ColorToInt(focusedSlider));
+    GuiSetStyle(SLIDER, TEXT_COLOR_PRESSED, ColorToInt(pressedSlider));
+
+    GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(sliderBg));
+    GuiSetStyle(SLIDER, BORDER, ColorToInt(neutralSlider));
+    GuiSetStyle(SLIDER, BORDER + 3, ColorToInt(focusedSlider));
+    GuiSetStyle(SLIDER, BORDER + 6, ColorToInt(focusedSlider));
 }
 
+//deseneaza cover-ul si titlul
 void DrawSong(const Song &song, int x, int y) {
     DrawText(song.title.c_str(), 110 + x, 20 + y, 20, WHITE);
     if (song.hasCover) {
@@ -31,6 +40,7 @@ void DrawSong(const Song &song, int x, int y) {
 
 }
 
+//deseneaza lista de piese
 typedef struct MusicPanel {
     int itemHeight = 100;
     Rectangle bounds = {0, 0, 640, 720};
@@ -44,15 +54,13 @@ typedef struct MusicPanel {
 
         BeginScissorMode((int)view.x, (int)view.y, (int)view.width, (int)view.height);
 
-
-
         int i = 0;
         for (auto &song : songs) {
             Rectangle itemRec = {view.x + scroll.x, view.y + scroll.y + float(i * itemHeight), content.width, (float)itemHeight};
             DrawSong(song, (int)itemRec.x, (int)itemRec.y);
 
             if (CheckCollisionPointRec(mousePoint, itemRec) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                songQueue.push(song);
+                songQueue.push(song); //adauga in queue
             }
             i++;
         }

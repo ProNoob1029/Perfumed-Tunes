@@ -4,14 +4,14 @@
 
 #ifndef SPOTIFY_CLONE_SONG_H
 #define SPOTIFY_CLONE_SONG_H
-
-#include <cstdlib>
-#include <codecvt>
+//folosim unicode pt caractere speciale
+#include <cstdlib> //pentru printf/ cout
+#include <codecvt> //traduce unicode
 #include "raylib.h"
-#include <queue>
+#include <queue> //lista ordonata, "first in, first out"-ca un fel de queue de la spotify
 #include <cstring>
-#include <string>
-#include <locale>
+#include <string> //salveaza mai simplu cstring
+#include <locale> //traduce unicode
 #include "id3v2lib-2.0/id3v2lib.h"
 
 struct Song {
