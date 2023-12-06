@@ -2,41 +2,14 @@
 #include "mygui.h" //fisier in care sunt elemente de interfata
 #include "song.h" //fisier in care sunt definite functiile unei piese
 #include "set" //librarie pentru multimea cu piese
-#include "atlas.h"
-
-Font testFont() {
-    Image img = LoadImage(ATLAS_ATLAS_IMAGE_PATH);
-    Font fontSdf = {};
-    fontSdf.baseSize = ATLAS_ATLAS_FONT_SIZE;
-    fontSdf.glyphCount = ATLAS_ATLAS_SPRITE_COUNT;
-    fontSdf.glyphPadding = 0;
-    fontSdf.texture = LoadTextureFromImage(img);
-    SetTextureFilter(fontSdf.texture, TEXTURE_FILTER_BILINEAR);
-    fontSdf.glyphs = (GlyphInfo *)malloc(ATLAS_ATLAS_SPRITE_COUNT*sizeof(GlyphInfo));
-    fontSdf.recs = (Rectangle *)malloc(ATLAS_ATLAS_SPRITE_COUNT*sizeof(Rectangle));
-    for (int i = 0; i < ATLAS_ATLAS_SPRITE_COUNT; i++) {
-        fontSdf.recs[i] = { (float)rtpDescAtlas[i].positionX, (float)rtpDescAtlas[i].positionY, (float)rtpDescAtlas[i].sourceWidth, (float)rtpDescAtlas[i].sourceHeight };
-
-        fontSdf.glyphs[i].value = rtpDescAtlas[i].charValue;
-        fontSdf.glyphs[i].offsetX = rtpDescAtlas[i].charOffsetX;
-        fontSdf.glyphs[i].offsetY = rtpDescAtlas[i].charOffsetY;
-        fontSdf.glyphs[i].advanceX = rtpDescAtlas[i].charAdvanceX;
-
-        fontSdf.glyphs[i].image = ImageFromImage(img, fontSdf.recs[i]);
-    }
-    UnloadImage(img);
-    return fontSdf;
-}
+#include "font.h"
 
 int main() {
     InitWindow(1280, 720, "spotify-clone"); //creeaza fereastra+ii da nume+size
     InitAudioDevice(); //"porneste castile"-se conecteaza la audio
     SetTargetFPS(60); //cat de rapid isi da update/ cat de rapid deseneaza/ viteza while/s
 
-    Shader shader = LoadShader(0, "sdf.fs");
-    Font sdfFont = testFont();
-
-    //TODO: try sdf fonts
+    LoadDefaultFont();
 
     Color background = {23, 15, 30, 255};
     ConfigUI(background); //change colors of UI
@@ -98,7 +71,7 @@ int main() {
 
         ClearBackground(background);
 
-        musicPanel.Draw(songs, songQueue, mousePoint, sdfFont, shader);
+        musicPanel.Draw(songs, songQueue, mousePoint);
 
         if (songPlaying.hasCover) {
             //DrawTexture(songPlaying.cover, 640, 0, WHITE);
@@ -125,6 +98,8 @@ int main() {
     for(const Song& song : songs) {
         UnloadSong(song);
     }
+
+    UnloadDefaultFont();
 
     CloseWindow();
 }

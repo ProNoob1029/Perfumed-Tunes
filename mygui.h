@@ -6,6 +6,7 @@
 #include "set"
 #define RAYGUI_IMPLEMENTATION   //DO NOT DELETE
 #include "raygui.h"
+#include "font.h"
 
 //schimba culorile la layout
 void ConfigUI(Color background) {
@@ -30,10 +31,10 @@ void ConfigUI(Color background) {
 }
 
 //deseneaza cover-ul si titlul
-void DrawSong(const Song &song, int x, int y, Font &font, Shader &shader) {
+void DrawSong(const Song &song, int x, int y) {
     //DrawText(song.title.c_str(), 110 + x, 20 + y, 20, WHITE);
-    BeginShaderMode(shader);
-    DrawTextEx(font, song.title.c_str(), {float(110 + x), float(20 + y)}, 32, 0, WHITE);
+    BeginShaderMode(defaultShader);
+    DrawTextEx(defaultFont, song.title.c_str(), {float(110 + x), float(20 + y)}, 32, 0, WHITE);
     EndShaderMode();
     if (song.hasCover) {
         DrawTextureEx(song.cover, {(float) x, (float) y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
@@ -50,7 +51,7 @@ typedef struct MusicPanel {
     Rectangle content = {0, 0, bounds.width - 14, 0};
     Vector2 scroll = {};
     Rectangle view = {};
-    void Draw(std::set<Song> &songs, std::queue<Song> &songQueue, Vector2 &mousePoint, Font &font, Shader &shader) {
+    void Draw(std::set<Song> &songs, std::queue<Song> &songQueue, Vector2 &mousePoint) {
         content.height = float(songs.size() * itemHeight);
 
         GuiScrollPanel(bounds, nullptr, content, &scroll, &view);
@@ -60,7 +61,7 @@ typedef struct MusicPanel {
         int i = 0;
         for (auto &song : songs) {
             Rectangle itemRec = {view.x + scroll.x, view.y + scroll.y + float(i * itemHeight), content.width, (float)itemHeight};
-            DrawSong(song, (int)itemRec.x, (int)itemRec.y, font, shader);
+            DrawSong(song, (int)itemRec.x, (int)itemRec.y);
 
             if (CheckCollisionPointRec(mousePoint, itemRec) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 songQueue.push(song); //adauga in queue
