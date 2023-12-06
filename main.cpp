@@ -2,51 +2,39 @@
 #include "mygui.h" //fisier in care sunt elemente de interfata
 #include "song.h" //fisier in care sunt definite functiile unei piese
 #include "set" //librarie pentru multimea cu piese
+#include "atlas.h"
 
-/*Font test() {
-    // Loading file to memory
-    unsigned int fileSize = 0;
-    unsigned char *fileData = LoadFileData("NotoSansJP-Regular.ttf", &fileSize);
+Font testFont() {
+    Image img = LoadImage(ATLAS_ATLAS_IMAGE_PATH);
+    Font fontSdf = {};
+    fontSdf.baseSize = ATLAS_ATLAS_FONT_SIZE;
+    fontSdf.glyphCount = ATLAS_ATLAS_SPRITE_COUNT;
+    fontSdf.glyphPadding = 0;
+    fontSdf.texture = LoadTextureFromImage(img);
+    SetTextureFilter(fontSdf.texture, TEXTURE_FILTER_BILINEAR);
+    fontSdf.glyphs = (GlyphInfo *)malloc(ATLAS_ATLAS_SPRITE_COUNT*sizeof(GlyphInfo));
+    fontSdf.recs = (Rectangle *)malloc(ATLAS_ATLAS_SPRITE_COUNT*sizeof(Rectangle));
+    for (int i = 0; i < ATLAS_ATLAS_SPRITE_COUNT; i++) {
+        fontSdf.recs[i] = { (float)rtpDescAtlas[i].positionX, (float)rtpDescAtlas[i].positionY, (float)rtpDescAtlas[i].sourceWidth, (float)rtpDescAtlas[i].sourceHeight };
 
-    char fontChars[] = " !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~șțăîâȘȚĂÎÂ";
+        fontSdf.glyphs[i].value = rtpDescAtlas[i].charValue;
+        fontSdf.glyphs[i].offsetX = rtpDescAtlas[i].charOffsetX;
+        fontSdf.glyphs[i].offsetY = rtpDescAtlas[i].charOffsetY;
+        fontSdf.glyphs[i].advanceX = rtpDescAtlas[i].charAdvanceX;
 
-    // Default font generation from TTF font
-   *//* Font fontDefault = { 0 };
-    fontDefault.baseSize = 16;
-    fontDefault.glyphCount = 107;
-
-    // Loading font data from memory data
-    // Parameters > font size: 16, no glyphs array provided (0), glyphs count: 95 (autogenerate chars array)
-    fontDefault.glyphs = LoadFontData(fileData, fileSize, 16, 0, 95, FONT_DEFAULT);
-    // Parameters > glyphs count: 95, font size: 16, glyphs padding in image: 4 px, pack method: 0 (default)
-    Image atlas = GenImageFontAtlas(fontDefault.glyphs, &fontDefault.recs, 95, 16, 4, 0);
-    fontDefault.texture = LoadTextureFromImage(atlas);
-    UnloadImage(atlas);*//*
-
-    // SDF font generation from TTF font
-    Font fontSDF = { 0 };
-    fontSDF.baseSize = 16;
-    fontSDF.glyphCount = 107;
-    // Parameters > font size: 16, no glyphs array provided (0), glyphs count: 0 (defaults to 95)
-    fontSDF.glyphs = LoadFontData(fileData, fileSize, 16, 0, 0, FONT_SDF);
-    // Parameters > glyphs count: 95, font size: 16, glyphs padding in image: 0 px, pack method: 1 (Skyline algorythm)
-    Image atlas = GenImageFontAtlas(fontSDF.glyphs, &fontSDF.recs, 107, 16, 0, 1);
-    fontSDF.texture = LoadTextureFromImage(atlas);
-    UnloadImage(atlas);
-
-    UnloadFileData(fileData);      // Free memory from loaded file
-
-    // Load SDF required shader (we use default vertex shader)
-    Shader shader = LoadShader(0, TextFormat("resources/shaders/glsl%i/sdf.fs", GLSL_VERSION));
-    SetTextureFilter(fontSDF.texture, TEXTURE_FILTER_BILINEAR);    // Required for SDF font
-}*/
+        fontSdf.glyphs[i].image = ImageFromImage(img, fontSdf.recs[i]);
+    }
+    UnloadImage(img);
+    return fontSdf;
+}
 
 int main() {
     InitWindow(1280, 720, "spotify-clone"); //creeaza fereastra+ii da nume+size
     InitAudioDevice(); //"porneste castile"-se conecteaza la audio
     SetTargetFPS(60); //cat de rapid isi da update/ cat de rapid deseneaza/ viteza while/s
 
-    //test();
+    Shader shader = LoadShader(0, "sdf.fs");
+    Font sdfFont = testFont();
 
     //TODO: try sdf fonts
 
@@ -110,7 +98,7 @@ int main() {
 
         ClearBackground(background);
 
-        musicPanel.Draw(songs, songQueue, mousePoint);
+        musicPanel.Draw(songs, songQueue, mousePoint, sdfFont, shader);
 
         if (songPlaying.hasCover) {
             //DrawTexture(songPlaying.cover, 640, 0, WHITE);

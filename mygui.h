@@ -30,8 +30,11 @@ void ConfigUI(Color background) {
 }
 
 //deseneaza cover-ul si titlul
-void DrawSong(const Song &song, int x, int y) {
-    DrawText(song.title.c_str(), 110 + x, 20 + y, 20, WHITE);
+void DrawSong(const Song &song, int x, int y, Font &font, Shader &shader) {
+    //DrawText(song.title.c_str(), 110 + x, 20 + y, 20, WHITE);
+    BeginShaderMode(shader);
+    DrawTextEx(font, song.title.c_str(), {float(110 + x), float(20 + y)}, 32, 0, WHITE);
+    EndShaderMode();
     if (song.hasCover) {
         DrawTextureEx(song.cover, {(float) x, (float) y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
     }
@@ -47,7 +50,7 @@ typedef struct MusicPanel {
     Rectangle content = {0, 0, bounds.width - 14, 0};
     Vector2 scroll = {};
     Rectangle view = {};
-    void Draw(std::set<Song> &songs, std::queue<Song> &songQueue, Vector2 &mousePoint) {
+    void Draw(std::set<Song> &songs, std::queue<Song> &songQueue, Vector2 &mousePoint, Font &font, Shader &shader) {
         content.height = float(songs.size() * itemHeight);
 
         GuiScrollPanel(bounds, nullptr, content, &scroll, &view);
@@ -57,7 +60,7 @@ typedef struct MusicPanel {
         int i = 0;
         for (auto &song : songs) {
             Rectangle itemRec = {view.x + scroll.x, view.y + scroll.y + float(i * itemHeight), content.width, (float)itemHeight};
-            DrawSong(song, (int)itemRec.x, (int)itemRec.y);
+            DrawSong(song, (int)itemRec.x, (int)itemRec.y, font, shader);
 
             if (CheckCollisionPointRec(mousePoint, itemRec) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 songQueue.push(song); //adauga in queue
