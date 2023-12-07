@@ -16,7 +16,6 @@
 
 struct Song {
     Music music{};
-    bool paused = false;
     std::string title;
     bool hasCover = false;
     Texture cover{};
