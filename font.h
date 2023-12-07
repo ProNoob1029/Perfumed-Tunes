@@ -13,7 +13,7 @@ void LoadDefaultFont() {
     fontSdf.glyphCount = ATLAS_ATLAS_SPRITE_COUNT;
     fontSdf.glyphPadding = 0;
     fontSdf.texture = LoadTextureFromImage(img);
-    SetTextureFilter(fontSdf.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(fontSdf.texture, TEXTURE_FILTER_TRILINEAR);
     fontSdf.glyphs = (GlyphInfo *)malloc(ATLAS_ATLAS_SPRITE_COUNT*sizeof(GlyphInfo));
     fontSdf.recs = (Rectangle *)malloc(ATLAS_ATLAS_SPRITE_COUNT*sizeof(Rectangle));
     for (int i = 0; i < ATLAS_ATLAS_SPRITE_COUNT; i++) {
