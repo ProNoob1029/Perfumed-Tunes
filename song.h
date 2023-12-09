@@ -14,36 +14,36 @@
 #include <locale> //traduce unicode
 #include "id3v2lib-2.0/id3v2lib.h"
 
-struct Song {
-    Music music{};
+struct Song { //toate informatiile unei melodii-muzica, cover si titlu
+    Music music{}; //audio
     std::string title;
     bool hasCover = false;
-    Texture cover{};
+    Texture cover{}; //coverul
 
     bool operator==(const Song &other) const {
-        return title == other.title;
+        return title == other.title; //compara titlurile pieselor=> se ord alfabetic
     }
 
-    bool operator<(const Song& other) const {
+    bool operator<(const Song& other) const { //ord alfabetica
         return title < other.title;
     }
 };
 
-void UnloadSong(const Song &song) {
+void UnloadSong(const Song &song) { //se sterge piesa din memorie dupa ce se inchide programul
     UnloadMusicStream(song.music);
     UnloadTexture(song.cover);
 }
 
-Song LoadSong(const char filepath[]) {
+Song LoadSong(const char filepath[]) { //primeste fisierul cu piesa=> creeaza piesa
     Song newSong;
-    newSong.music = LoadMusicStream(filepath);
+    newSong.music = LoadMusicStream(filepath); //incarca audio
     newSong.music.looping = false;
 
-    ID3v2_Tag *tag = ID3v2_read_tag(filepath);
+    ID3v2_Tag *tag = ID3v2_read_tag(filepath); //librarie care citeste info pe langa audio
 
-    ID3v2_ApicFrame *cover = ID3v2_Tag_get_album_cover_frame(tag);
+    ID3v2_ApicFrame *cover = ID3v2_Tag_get_album_cover_frame(tag); //incearca sa citeasca cover
 
-    if (cover != nullptr) {
+    if (cover != nullptr) { //daca o gasit cover=> genereaza imagine
         Image coverImage = LoadImageFromMemory(
                 TextFormat(".%s", strrchr(reinterpret_cast<char *>(cover->data->mime_type), '/') + 1),
                 reinterpret_cast<const unsigned char *>(cover->data->data), cover->data->picture_size
@@ -55,9 +55,9 @@ Song LoadSong(const char filepath[]) {
         UnloadImage(coverImage);
     }
 
-    ID3v2_TextFrame *tagTitle = ID3v2_Tag_get_title_frame(tag);
+    ID3v2_TextFrame *tagTitle = ID3v2_Tag_get_title_frame(tag); //incearca sa gaseasca titlu
 
-    if (tagTitle != nullptr) {
+    if (tagTitle != nullptr) { //genereaza titlu
         if(tagTitle->data->encoding == '\001') {
             //Encoding is a bitch
             std::u16string u16title = (char16_t*)tagTitle->data->text;
@@ -77,7 +77,7 @@ Song LoadSong(const char filepath[]) {
     return newSong;
 }
 
-void GetSongFilePaths(std::queue<std::string> &paths, char filepath[]) {
+void GetSongFilePaths(std::queue<std::string> &paths, char filepath[]) { //functia recursiva care cauta prin folder
     if (IsPathFile(filepath)) {
         if (FileExists(filepath) && IsFileExtension(filepath, ".mp3")) { //verifica daca exista si e mp3
             paths.emplace(filepath);
