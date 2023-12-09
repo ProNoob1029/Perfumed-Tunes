@@ -2,12 +2,14 @@
 #define SPOTIFY_CLONE_FONT_H
 #include "raylib.h"
 #include "atlas.h"
+#include "atlas-image.h"
 
 Font defaultFont;
 Shader defaultShader;
 
 void LoadDefaultFont() {
-    Image img = LoadImage(ATLAS_ATLAS_IMAGE_PATH);
+    //Image img = LoadImage(ATLAS_ATLAS_IMAGE_PATH);
+    Image img = LoadImageFromMemory(".png", atlas, atlasSize);
     Font fontSdf = {};
     fontSdf.baseSize = ATLAS_ATLAS_FONT_SIZE;
     fontSdf.glyphCount = ATLAS_ATLAS_SPRITE_COUNT;
