@@ -2,7 +2,7 @@
 #define SPOTIFY_CLONE_FONT_H
 #include "raylib.h"
 #include "atlas.h"
-#include "atlas-image.h"
+#include "atlas.png.h"
 
 Font defaultFont;
 Shader defaultShader;
