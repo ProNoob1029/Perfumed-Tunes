@@ -7,6 +7,33 @@
 Font defaultFont;
 Shader defaultShader;
 
+const char shaderCode[] = "#version 330\n"
+                          "\n"
+                          "// Input vertex attributes (from vertex shader)\n"
+                          "in vec2 fragTexCoord;\n"
+                          "in vec4 fragColor;\n"
+                          "\n"
+                          "// Input uniform values\n"
+                          "uniform sampler2D texture0;\n"
+                          "uniform vec4 colDiffuse;\n"
+                          "\n"
+                          "// Output fragment color\n"
+                          "out vec4 finalColor;\n"
+                          "\n"
+                          "// NOTE: Add here your custom variables\n"
+                          "\n"
+                          "void main()\n"
+                          "{\n"
+                          "    // Texel color fetching from texture sampler\n"
+                          "    // NOTE: Calculate alpha using signed distance field (SDF)\n"
+                          "    float distanceFromOutline = texture(texture0, fragTexCoord).a - 0.5;\n"
+                          "    float distanceChangePerFragment = length(vec2(dFdx(distanceFromOutline), dFdy(distanceFromOutline)));\n"
+                          "    float alpha = smoothstep(-distanceChangePerFragment, distanceChangePerFragment, distanceFromOutline);\n"
+                          "\n"
+                          "    // Calculate final fragment color\n"
+                          "    finalColor = vec4(fragColor.rgb, fragColor.a*alpha);\n"
+                          "}";
+
 void LoadDefaultFont() {
     //Image img = LoadImage(ATLAS_ATLAS_IMAGE_PATH);
     Image img = LoadImageFromMemory(".png", atlas, atlasSize);
@@ -30,7 +57,8 @@ void LoadDefaultFont() {
     }
     UnloadImage(img);
     defaultFont = fontSdf;
-    defaultShader = LoadShader(nullptr, "sdf.fs");
+    //defaultShader = LoadShader(nullptr, "sdf.fs");
+    defaultShader = LoadShaderFromMemory(nullptr, shaderCode);
 }
 
 void UnloadDefaultFont() {
