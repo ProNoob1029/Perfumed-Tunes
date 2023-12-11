@@ -11,7 +11,8 @@
 
 //schimba culorile la layout
 void ConfigUI(Color background) {
-    GuiSetStyle(SLIDER, BORDER_WIDTH, 0);
+    GuiSetIconScale(2);
+
     GuiSetStyle(DEFAULT, BORDER_WIDTH, 0);
 
     Color sliderBg = {49, 37, 61, 255};
@@ -26,26 +27,53 @@ void ConfigUI(Color background) {
     GuiSetStyle(SLIDER, TEXT_COLOR_PRESSED, ColorToInt(pressedSlider));
 
     GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(sliderBg));
+
     GuiSetStyle(SLIDER, BORDER, ColorToInt(neutralSlider));
     GuiSetStyle(SLIDER, BORDER + 3, ColorToInt(focusedSlider));
     GuiSetStyle(SLIDER, BORDER + 6, ColorToInt(focusedSlider));
+
+    GuiSetStyle(BUTTON, TEXT + 0, ColorToInt(neutralSlider));
+    GuiSetStyle(BUTTON, TEXT + 3, ColorToInt(focusedSlider));
+    GuiSetStyle(BUTTON, TEXT + 6, ColorToInt(pressedSlider));
+
+    //GuiSetStyle(BUTTON, BASE + 0, );
+    GuiSetStyle(BUTTON, BASE + 3, ColorToInt(pressedSlider));
+    GuiSetStyle(BUTTON, BASE + 6, ColorToInt(focusedSlider));
+
+    GuiSetStyle(BUTTON, BORDER + 0, ColorToInt(neutralSlider));
+    GuiSetStyle(BUTTON, BORDER + 3, ColorToInt(focusedSlider));
+    GuiSetStyle(BUTTON, BORDER + 6, ColorToInt(pressedSlider));
 }
 
 
 //deseneaza cover-ul si titlul
 void DrawSong(const Song &song, Rectangle songBox) {
-    //DrawText(song.title.c_str(), 110 + x, 20 + y, 20, WHITE);
     Rectangle textBox = {songBox.x + 110, songBox.y + 15, songBox.width - 110, songBox.height - 20};
     BeginShaderMode(defaultShader);
-    //DrawTextEx(defaultFont, song.title.c_str(), {float(110 + x), float(20 + y)}, 32, 0, WHITE);
     DrawTextBoxed(defaultFont, song.title.c_str(), textBox, 32, 0, true, WHITE);
     EndShaderMode();
     if (song.hasCover) {
         DrawTextureEx(song.cover, {(float) songBox.x, (float) songBox.y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
     }
+}
 
-    // Check button state
+void ProgressBar(Rectangle pos, float &slider, Music musicPlaying) {
+    Vector2 mousePoint = GetMousePosition();
+    bool mouseOnSlider = CheckCollisionPointRec(mousePoint, pos);
+    if (mouseOnSlider && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+        SeekMusicStream(musicPlaying, slider * GetMusicTimeLength(musicPlaying));
+    }
+    if (!mouseOnSlider || IsMouseButtonUp(MOUSE_BUTTON_LEFT)) {
+        slider = GetMusicTimePlayed(musicPlaying) / GetMusicTimeLength(musicPlaying);
+    }
+    GuiSliderBar(pos, nullptr, nullptr, &slider, 0.0f, 1.0f);
+}
 
+bool PlayButton(Rectangle pos, bool musicPlaying) {
+    const char *buttonIcon = musicPlaying?
+                             GuiIconText(ICON_PLAYER_PAUSE, nullptr)
+                            : GuiIconText(ICON_PLAYER_PLAY, nullptr);
+    return GuiButton(pos, buttonIcon);
 }
 
 //deseneaza lista de piese
@@ -53,10 +81,10 @@ typedef struct MusicPanel {
     int itemHeight = 100;
     Rectangle bounds = {0, 0, 320, 720};
     Rectangle content = {0, 0, bounds.width - 14, 0};
-    //Vector2 scroll = {};
     Rectangle view = {};
-    Song Draw(std::vector<Song> &songs, Vector2 &mousePoint, Vector2 &scroll) {
-        Song result = {};
+    int Draw(std::vector<Song> &songs, Vector2 &scroll) {
+        Vector2 mousePoint = GetMousePosition();
+        int result = -1;
 
         content.height = float(songs.size() * itemHeight);
         content.width = bounds.width - 14;
@@ -70,9 +98,8 @@ typedef struct MusicPanel {
             Rectangle itemRec = {view.x + scroll.x, view.y + scroll.y + float(i * itemHeight), content.width, (float)itemHeight};
             DrawSong(song, itemRec);
 
-            if (CheckCollisionPointRec(mousePoint, itemRec) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                //songQueue.push(song);
-                result = song;  //adauga in queue
+            if (CheckCollisionPointRec(mousePoint, itemRec) && (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))) {
+                result = i;     //adauga in queue
             }
             i++;
         }
