@@ -9,7 +9,7 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-#define ATLAS_ATLAS_IMAGE_PATH      "atlas.png"
+//#define ATLAS_ATLAS_IMAGE_PATH      "atlas.png"
 #define ATLAS_ATLAS_SPRITE_COUNT    101
 #define ATLAS_ATLAS_FONT_SIZE       39
 
