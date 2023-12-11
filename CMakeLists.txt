@@ -32,7 +32,7 @@ add_executable(${PROJECT_NAME} main.cpp
         atlas.h
         atlas.png.h)
 #set(raylib_VERBOSE 1)
-target_link_libraries(${PROJECT_NAME} raylib id3v2lib -static-libstdc++ -static-libgcc)
+target_link_libraries(${PROJECT_NAME} raylib id3v2lib)
 
 # Web Configurations
 if (${PLATFORM} STREQUAL "Web")
