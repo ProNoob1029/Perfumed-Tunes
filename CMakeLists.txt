@@ -28,7 +28,8 @@ add_executable(${PROJECT_NAME} main.cpp
         mygui.h
         song.h
         font.h
-        text.h)
+        text.h
+        atlas.png.h)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib id3v2lib -static-libstdc++ -static-libgcc)
 
