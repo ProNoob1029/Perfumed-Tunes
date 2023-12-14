@@ -55,6 +55,9 @@ void DrawSong(const Song &song, Rectangle songBox) {
     if (song.hasCover) {
         DrawTextureEx(song.cover, {(float) songBox.x, (float) songBox.y}, 0.0f, 100.0f / (float)std::max(song.cover.height, song.cover.width), WHITE);
     }
+    if (CheckCollisionPointRec(GetMousePosition(), songBox)) {
+        DrawRectangle((int)songBox.x, (int)songBox.y, (int)songBox.width, (int)songBox.height, Color{255, 255, 255, 30});
+    }
 }
 
 void ProgressBar(Rectangle pos, float &slider, Music musicPlaying) {

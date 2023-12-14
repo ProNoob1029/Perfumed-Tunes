@@ -8,7 +8,7 @@
 int main() {
     InitWindow(1280, 720, "spotify-clone"); //creeaza fereastra+ii da nume+size
     InitAudioDevice(); //"porneste castile"-se conecteaza la audio
-    SetMasterVolume(0.5f);
+    SetMasterVolume(0.5f); //volumul aplicatiei
     SetTargetFPS(60); //cat de rapid isi da update/ cat de rapid deseneaza/ viteza while/s
 
     LoadDefaultFont();
@@ -19,7 +19,7 @@ int main() {
     MusicPanel musicPanel;  //the music list on the left
 
     std::queue<std::string> songPaths;  //song filepaths queued for importing-fisierele sunt incarcate pe rand
-    GetSongFilePaths(songPaths, "/home/dragos/Music/OnTheSpot");        //TODO: REMOVE AFTER RELEASE
+    GetSongFilePaths(songPaths, (char*)"/home/dragos/Music/OnTheSpot");        //TODO: REMOVE AFTER RELEASE
     std::set<Song> songs; //o multime de piese
     std::deque<Song> songQueue; //queue-ul incepe cu urmatoarea piesa
     std::deque<Song> songBackStack;
@@ -31,11 +31,11 @@ int main() {
     float slider = 0.0f; //piesa incepe de la timpul 0.0
 
     while (!WindowShouldClose()) { // verifica daca ai inchis programul (true=> stop)
-        bool skipSong = IsKeyPressed(KEY_P);
+        bool skipSong = IsKeyPressed(KEY_P); //daca se apasa pe tasta P=> skip
 
-        bool playPrevious = IsKeyPressed(KEY_O);
+        bool playPrevious = IsKeyPressed(KEY_O); //daca se apasa tasta O=> previous song
 
-        bool pauseSong = IsKeyPressed(KEY_SPACE);
+        bool pauseSong = IsKeyPressed(KEY_SPACE); //pause
 
         while (songBackStack.size() > 100) {
             songBackStack.pop_back();
@@ -102,6 +102,7 @@ int main() {
             PlayMusicStream(songPlaying.music); //Play next song
         }
 
+        //interfata
         if (songPlaying.hasCover) {
             DrawTextureEx(songPlaying.cover, {musicPanel.bounds.width + 20, 20}, 0.0f, (640 - 40) / 640.0f, WHITE);
         }
@@ -119,8 +120,12 @@ int main() {
 
             Rectangle forwardButtonRec = { middle + 70.0f - 50.0f / 2, sliderRec.y + sliderRec.height + 10.0f, 50, 50};
             skipSong = skipSong || GuiButton(forwardButtonRec, GuiIconText(ICON_PLAYER_NEXT, nullptr));
+            GuiSetStyle(DEFAULT, BORDER_WIDTH, 0);
+        }
 
-            Rectangle backButtonRec = { middle - 70.0f - 50.0f / 2, sliderRec.y + sliderRec.height + 10.0f, 50, 50};
+        if (!songBackStack.empty()) {
+            Rectangle backButtonRec = { 640 - 70.0f - 50.0f / 2, 640 - 10 + (60 - 20 * 2) + 10.0f, 50, 50};
+            GuiSetStyle(DEFAULT, BORDER_WIDTH, 1);
             playPrevious = playPrevious || GuiButton(backButtonRec, GuiIconText(ICON_PLAYER_PREVIOUS, nullptr));
             GuiSetStyle(DEFAULT, BORDER_WIDTH, 0);
         }
@@ -147,7 +152,7 @@ int main() {
                 songQueue.push_front(songPlaying);
             }
             songPlaying = songBackStack.front();
-            songBackStack.pop_front();
+            songBackStack.pop_front(); //lista cu piese care au fost ascultate deja
             SeekMusicStream(songPlaying.music, 0.0f);
             PlayMusicStream(songPlaying.music);
         }
