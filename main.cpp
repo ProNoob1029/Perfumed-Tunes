@@ -9,6 +9,7 @@ int main() {
     InitWindow(1280, 720, "Perfumed"); //creeaza fereastra+ii da nume+size
     InitAudioDevice(); //"porneste castile"-se conecteaza la audio
 
+    //Seteaza logo-ul aplicatiei
     Image icon = LoadImageFromMemory(".png", icon_data, icon_size);
     SetWindowIcon(icon);
     UnloadImage(icon);
@@ -141,7 +142,7 @@ int main() {
             songQueue.erase(songQueue.begin() + removeSongIndex);
         }
 
-        DrawFPS(0,0);
+        DrawFPS(0,0);   //TODO: REMOVE AFTER RELEASE
 
         EndDrawing();
 
