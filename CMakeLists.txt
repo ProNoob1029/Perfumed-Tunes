@@ -36,7 +36,7 @@ add_executable(${PROJECT_NAME} main.cpp
         atlas.png.h
         icon.h)
 #set(raylib_VERBOSE 1)
-target_link_libraries(${PROJECT_NAME} raylib id3v2lib -static)
+target_link_libraries(${PROJECT_NAME} raylib id3v2lib -static -mwindows#[[turn off console]])
 
 # Web Configurations
 if (${PLATFORM} STREQUAL "Web")
