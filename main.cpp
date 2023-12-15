@@ -3,11 +3,16 @@
 #include "song.h" //fisier in care sunt definite functiile unei piese
 #include "set" //librarie pentru multimea cu piese
 #include "font.h"
-#include "algorithm"
+#include "icon.h"
 
 int main() {
-    InitWindow(1280, 720, "spotify-clone"); //creeaza fereastra+ii da nume+size
+    InitWindow(1280, 720, "Perfumed"); //creeaza fereastra+ii da nume+size
     InitAudioDevice(); //"porneste castile"-se conecteaza la audio
+
+    Image icon = LoadImageFromMemory(".png", icon_data, icon_size);
+    SetWindowIcon(icon);
+    UnloadImage(icon);
+
     SetMasterVolume(0.5f); //volumul aplicatiei
     SetTargetFPS(60); //cat de rapid isi da update/ cat de rapid deseneaza/ viteza while/s
 

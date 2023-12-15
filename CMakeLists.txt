@@ -33,7 +33,8 @@ add_executable(${PROJECT_NAME} main.cpp
         font.h
         text.h
         atlas.h
-        atlas.png.h)
+        atlas.png.h
+        icon.h)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib id3v2lib -static)
 
