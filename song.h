@@ -17,15 +17,16 @@
 struct Song { //toate informatiile unei melodii-muzica, cover si titlu
     Music music{}; //audio
     std::string title;
+    std::string artist;
     bool hasCover = false;
     Texture cover{}; //coverul
 
     bool operator==(const Song &other) const {
-        return title == other.title; //compara titlurile pieselor=> se ord alfabetic
+        return (title + artist) == (other.title + other.artist); //compara titlurile pieselor=> se ord alfabetic
     }
 
     bool operator<(const Song& other) const { //ord alfabetica
-        return title < other.title;
+        return (title + artist) < (other.title + other.artist);
     }
 };
 
@@ -70,6 +71,19 @@ Song LoadSong(const char filepath[]) { //primeste fisierul cu piesa=> creeaza pi
         std::string filename = GetFileName(filepath);
         newSong.title = filename.substr(0, filename.length() - 4);
         printf("%s\n", newSong.title.c_str());
+    }
+
+    ID3v2_TextFrame *tagArtist = ID3v2_Tag_get_artist_frame(tag); //incearca sa gaseasca artistul
+
+    if (tagArtist != nullptr) { //genereaza titlu
+        if(tagArtist->data->encoding == '\001') {
+            //Encoding is a bitch
+            std::u16string u16artist = (char16_t*)tagArtist->data->text;
+            newSong.artist = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16artist);
+            newSong.artist = newSong.artist.c_str() + 3;
+        } else {
+            newSong.artist = tagArtist->data->text;
+        }
     }
 
     free(tag);
