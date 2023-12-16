@@ -14,7 +14,7 @@ int main() {
     SetWindowIcon(icon);
     UnloadImage(icon);
 
-    SetMasterVolume(0.5f); //volumul aplicatiei
+    SetMasterVolume(1.0f); //volumul aplicatiei
     SetTargetFPS(60); //cat de rapid isi da update/ cat de rapid deseneaza/ viteza while/s
 
     LoadDefaultFont();
