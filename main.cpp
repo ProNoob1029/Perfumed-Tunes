@@ -25,7 +25,6 @@ int main() {
     MusicPanel musicPanel;  //the music list on the left
 
     std::queue<std::string> songPaths;  //song filepaths queued for importing-fisierele sunt incarcate pe rand
-    GetSongFilePaths(songPaths, (char*)"/home/dragos/Music/OnTheSpot");        //TODO: REMOVE AFTER RELEASE
     std::set<Song> songs; //o multime de piese
     std::deque<Song> songQueue; //queue-ul incepe cu urmatoarea piesa
     std::deque<Song> songBackStack;
@@ -141,8 +140,6 @@ int main() {
         if (removeSongIndex > -1) {
             songQueue.erase(songQueue.begin() + removeSongIndex);
         }
-
-        DrawFPS(0,0);   //TODO: REMOVE AFTER RELEASE
 
         EndDrawing();
 
