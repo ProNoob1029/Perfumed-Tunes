@@ -24,6 +24,9 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 endif()
 
 # Our Project
+include_directories("C:/Program Files (x86)/id3v2lib/include")
+link_directories("C:/Program Files (x86)/id3v2lib/lib")
+
 add_executable(${PROJECT_NAME} main.cpp
         mygui.h
         song.h
@@ -33,7 +36,7 @@ add_executable(${PROJECT_NAME} main.cpp
         atlas.png.h
         icon.h)
 #set(raylib_VERBOSE 1)
-target_link_libraries(${PROJECT_NAME} raylib id3v2lib)
+target_link_libraries(${PROJECT_NAME} raylib id3v2lib -static -mwindows#[[turn off console]])
 
 # Web Configurations
 if (${PLATFORM} STREQUAL "Web")
