@@ -6,7 +6,7 @@
 #include "icon.h"
 
 int main() {
-    InitWindow(1280, 720, "Perfumed"); //creeaza fereastra+ii da nume+size
+    InitWindow(1280, 720, "Perfumed Tunes"); //creeaza fereastra+ii da nume+size
     InitAudioDevice(); //"porneste castile"-se conecteaza la audio
 
     //Seteaza logo-ul aplicatiei
